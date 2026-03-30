@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexaVerse | Request Citizenship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --void: #03000d; --border: rgba(180,120,255,0.15); --border-glow: rgba(180,120,255,0.45); --purple-core: #8b3dff; --fuchsia-core: #d63aff; --cyan-accent: #d63aff; --green-accent: #8b3dff; --text-primary: #f0ecff; --text-muted: rgba(180,160,220,0.5); --text-dim: rgba(140,120,180,0.35); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--void); font-family: 'Rajdhani', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow-x: hidden; overflow-y: auto; position: relative; padding: 40px 20px; }
+  .scene { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
+  .scene::after { content: ''; position: absolute; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"); opacity: 0.03; pointer-events: none; }
+  .nebula { position: absolute; border-radius: 50%; filter: blur(120px); pointer-events: none; }
+  .nebula-1 { width: 900px; height: 900px; background: radial-gradient(circle, rgba(120,40,255,0.18) 0%, transparent 70%); top: -350px; left: -300px; animation: drift1 28s ease-in-out infinite; }
+  .nebula-2 { width: 700px; height: 700px; background: radial-gradient(circle, rgba(140,60,255,0.08) 0%, transparent 70%); bottom: -250px; right: -200px; animation: drift2 34s ease-in-out infinite; }
+  .nebula-3 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(180,100,255,0.06) 0%, transparent 70%); top: 40%; left: 55%; animation: drift3 20s ease-in-out infinite; }
+  @keyframes drift1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(60px,40px) scale(1.08)} }
+  @keyframes drift2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-50px,-30px) scale(1.05)} }
+  @keyframes drift3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,20px)} }
+  .stars { position: absolute; inset: 0; background: radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.7) 0%, transparent 100%), radial-gradient(1px 1px at 23% 67%, rgba(255,255,255,0.5) 0%, transparent 100%), radial-gradient(1.5px 1.5px at 38% 31%, rgba(255,255,255,0.6) 0%, transparent 100%), radial-gradient(1px 1px at 52% 82%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 67% 12%, rgba(255,255,255,0.65) 0%, transparent 100%), radial-gradient(1.5px 1.5px at 75% 54%, rgba(255,255,255,0.5) 0%, transparent 100%), radial-gradient(1px 1px at 84% 78%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 91% 35%, rgba(255,255,255,0.6) 0%, transparent 100%), radial-gradient(1px 1px at 5% 88%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1.5px 1.5px at 46% 47%, rgba(180,130,255,0.6) 0%, transparent 100%), radial-gradient(2px 2px at 30% 90%, rgba(200,150,255,0.5) 0%, transparent 100%), radial-gradient(1.5px 1.5px at 72% 8%, rgba(140,60,255,0.4) 0%, transparent 100%); }
+  .globe-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; background: transparent; }
+  .globe-ring { position: relative; width: 620px; height: 620px; display: flex; align-items: center; justify-content: center; }
+  .globe-img { width: 620px; height: 620px; object-fit: contain; opacity: 0.18; animation: spinSlow 35s linear infinite; filter: saturate(1.0) brightness(0.5) contrast(0.9) drop-shadow(0 0 30px rgba(80,140,255,0.2)); mix-blend-mode: screen; }
+  .orbital { position: absolute; border-radius: 50%; border: 1px solid; pointer-events: none; animation: spinSlow linear infinite; }
+  .orbital-1 { width: 680px; height: 680px; border-color: rgba(140,60,255,0.08); animation-duration: 40s; }
+  .orbital-2 { width: 760px; height: 760px; border-color: rgba(120,80,255,0.06); animation-duration: 60s; animation-direction: reverse; }
+  .orbital-dot { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: var(--green-accent); box-shadow: 0 0 8px var(--green-accent); top: -2px; left: 50%; transform: translateX(-50%); }
+  @keyframes spinSlow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  .scanline { position: absolute; width: 100%; height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(140,60,255,0.2) 30%, rgba(214,58,255,0.4) 50%, rgba(140,60,255,0.2) 70%, transparent 100%); animation: scan 10s ease-in-out infinite; pointer-events: none; }
+  @keyframes scan { 0%{top:-2px;opacity:0} 5%{opacity:1} 95%{opacity:1} 100%{top:100%;opacity:0} }
+  .card-wrap { position: relative; z-index: 10; width: 100%; max-width: 520px; }
+  .card { position: relative; padding: 36px 40px; border-radius: 28px; background: linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid var(--border); backdrop-filter: blur(40px) saturate(1.6); -webkit-backdrop-filter: blur(40px) saturate(1.6); box-shadow: 0 0 0 1px rgba(255,255,255,0.04) inset, 0 40px 80px rgba(0,0,0,0.7), 0 0 60px rgba(140,60,255,0.04); animation: cardIn 0.9s cubic-bezier(0.16,1,0.3,1) both; }
+  @keyframes cardIn { from{opacity:0;transform:translateY(28px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+  .card::before { content: ''; position: absolute; top: -1px; left: -1px; width: 60px; height: 60px; border-top: 2px solid var(--green-accent); border-left: 2px solid var(--green-accent); border-radius: 28px 0 0 0; opacity: 0.6; }
+  .card::after { content: ''; position: absolute; bottom: -1px; right: -1px; width: 60px; height: 60px; border-bottom: 2px solid var(--purple-core); border-right: 2px solid var(--purple-core); border-radius: 0 0 28px 0; opacity: 0.7; }
+  .header { text-align: center; margin-bottom: 24px; animation: fadeUp 0.8s 0.1s cubic-bezier(0.16,1,0.3,1) both; }
+  .logo-img { width: 64px; height: 64px; object-fit: contain; margin: 0 auto 10px; display: block; mix-blend-mode: screen; filter: drop-shadow(0 0 16px rgba(140,60,255,0.4)) drop-shadow(0 0 28px rgba(214,58,255,0.3)); }
+  .wordmark { font-family: 'Orbitron', monospace; font-weight: 900; font-size: 28px; letter-spacing: 0.08em; color: var(--text-primary); line-height: 1; }
+  .wordmark span { background: linear-gradient(135deg, var(--purple-core), var(--fuchsia-core)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .tagline { margin-top: 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.45em; color: var(--text-dim); text-transform: uppercase; }
+  .citizenship-badge { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 6px 16px; border-radius: 999px; background: rgba(140,60,255,0.06); border: 1px solid rgba(140,60,255,0.2); font-size: 10px; font-weight: 600; letter-spacing: 0.25em; color: var(--green-accent); text-transform: uppercase; }
+  .badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green-accent); box-shadow: 0 0 6px var(--green-accent); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin-bottom: 22px; animation: fadeUp 0.8s 0.2s cubic-bezier(0.16,1,0.3,1) both; }
+  .steps { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 28px; animation: fadeUp 0.8s 0.25s cubic-bezier(0.16,1,0.3,1) both; }
+  .step { display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; }
+  .step-circle { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', monospace; font-size: 11px; font-weight: 700; color: var(--text-dim); background: rgba(255,255,255,0.02); transition: all 0.4s; position: relative; z-index: 1; }
+  .step.active .step-circle { border-color: var(--green-accent); color: var(--green-accent); background: rgba(140,60,255,0.08); box-shadow: 0 0 16px rgba(140,60,255,0.2); }
+  .step.done .step-circle { border-color: var(--purple-core); background: rgba(139,61,255,0.15); color: var(--purple-core); }
+  .step-label { font-size: 8px; font-weight: 600; letter-spacing: 0.15em; color: var(--text-dim); text-transform: uppercase; white-space: nowrap; transition: color 0.4s; }
+  .step.active .step-label { color: var(--green-accent); }
+  .step.done .step-label { color: rgba(139,61,255,0.6); }
+  .step-line { width: 48px; height: 1px; background: var(--border); margin: 0 4px; margin-bottom: 22px; position: relative; overflow: hidden; transition: background 0.4s; }
+  .step-line.done { background: rgba(139,61,255,0.4); }
+  .step-line::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(140,60,255,0.6), transparent); animation: lineSweep 3s ease-in-out infinite; }
+  @keyframes lineSweep { 0%{left:-100%} 100%{left:100%} }
+  .form-panel { display: none; }
+  .form-panel.active { display: block; animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+  .panel-title { font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700; letter-spacing: 0.15em; color: var(--text-primary); text-transform: uppercase; margin-bottom: 6px; }
+  .panel-sub { font-size: 12px; color: var(--text-muted); letter-spacing: 0.05em; line-height: 1.6; margin-bottom: 22px; }
+  .form-group { margin-bottom: 16px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.3em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; padding-left: 2px; }
+  .input-wrap { position: relative; }
+  .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.35; pointer-events: none; transition: opacity 0.3s; }
+  input, select, textarea { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px 13px 42px; color: var(--text-primary); font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.04em; outline: none; transition: border-color 0.3s, background 0.3s, box-shadow 0.3s; caret-color: var(--green-accent); -webkit-appearance: none; }
+  select { padding-left: 42px; cursor: pointer; }
+  select option { background: #0d0020; color: var(--text-primary); }
+  textarea { resize: none; height: 80px; padding-top: 12px; line-height: 1.5; }
+  input::placeholder, textarea::placeholder { color: rgba(180,160,220,0.22); font-size: 13px; }
+  input:focus, select:focus, textarea:focus { border-color: rgba(140,60,255,0.4); background: rgba(140,60,255,0.04); box-shadow: 0 0 0 3px rgba(140,60,255,0.08), 0 0 20px rgba(140,60,255,0.04); }
+  input:focus ~ .input-icon, select:focus ~ .input-icon { opacity: 0.7; }
+  .input-line { position: absolute; bottom: 0; left: 12px; right: 12px; height: 1px; background: linear-gradient(90deg, var(--green-accent), var(--cyan-accent)); border-radius: 1px; transform: scaleX(0); transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); transform-origin: left; }
+  input:focus + .input-line, select:focus + .input-line, textarea:focus + .input-line { transform: scaleX(1); }
+  .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-dim); padding: 4px; transition: color 0.2s; display: flex; align-items: center; }
+  .pwd-toggle:hover { color: var(--text-muted); }
+  .pwd-strength { margin-top: 8px; display: flex; gap: 4px; align-items: center; }
+  .strength-bar { height: 3px; flex: 1; border-radius: 2px; background: rgba(255,255,255,0.06); transition: background 0.4s; }
+  .strength-bar.weak { background: #ff4455; }
+  .strength-bar.medium { background: #ffaa00; }
+  .strength-bar.strong { background: var(--green-accent); }
+  .strength-label { font-size: 10px; font-weight: 600; letter-spacing: 0.15em; color: var(--text-dim); text-transform: uppercase; min-width: 50px; text-align: right; transition: color 0.4s; }
+  .check-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+  .check-row input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; min-width: 16px; border: 1px solid var(--border); border-radius: 5px; background: transparent; padding: 0; cursor: pointer; transition: all 0.2s; position: relative; margin-top: 2px; }
+  .check-row input[type="checkbox"]:checked { background: var(--green-accent); border-color: var(--green-accent); box-shadow: 0 0 8px rgba(140,60,255,0.3); }
+  .check-row input[type="checkbox"]:checked::after { content: ''; position: absolute; top: 2px; left: 5px; width: 4px; height: 7px; border: 2px solid #000; border-top: none; border-left: none; transform: rotate(45deg); }
+  .check-label { font-size: 12px; font-weight: 400; letter-spacing: 0.04em; color: var(--text-muted); line-height: 1.6; cursor: pointer; }
+  .check-label a { color: rgba(140,60,255,0.7); text-decoration: none; border-bottom: 1px solid rgba(140,60,255,0.2); transition: color 0.2s; }
+  .check-label a:hover { color: var(--green-accent); }
+  .btn-row { display: flex; gap: 12px; margin-top: 22px; }
+  .btn-back { padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .btn-back:hover { border-color: var(--border-glow); color: var(--text-primary); }
+
+  /* UPDATED NEXAVERSE PURPLE BUTTON THEME */
+  .btn-next, .btn-submit, .btn-login-now {
+    flex: 1;
+    position: relative;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    overflow: hidden;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: white;
+    background: linear-gradient(135deg, #1a0050 0%, #3d007a 50%, #1a0050 100%);
+    box-shadow: 0 4px 30px rgba(140, 60, 255, 0.35), 0 1px 0 rgba(255, 255, 255, 0.15) inset;
+    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+  }
+  .btn-login-now { text-decoration: none; display: inline-block; padding: 15px 40px; }
+  .btn-next:hover, .btn-submit:hover, .btn-login-now:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, var(--purple-core) 0%, var(--fuchsia-core) 100%);
+    box-shadow: 0 8px 40px rgba(140, 60, 255, 0.4);
+  }
+  .btn-next:active, .btn-submit:active { transform: scale(0.98); }
+  .btn-next::after {
+    content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transform: skewX(-20deg); animation: shimmer 4s 1s ease-in-out infinite;
+  }
+  @keyframes shimmer { 0%{left:-100%} 40%,100%{left:160%} }
+
+  .success-panel { display: none; text-align: center; padding: 20px 0; animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+  .success-panel.active { display: block; }
+  .success-icon { width: 80px; height: 80px; margin: 0 auto 20px; border-radius: 50%; background: rgba(140,60,255,0.08); border: 1px solid rgba(140,60,255,0.3); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(140,60,255,0.15); animation: successPulse 2s ease-in-out infinite; }
+  @keyframes successPulse { 0%,100% { box-shadow: 0 0 40px rgba(140,60,255,0.15); } 50% { box-shadow: 0 0 60px rgba(140,60,255,0.3); } }
+  .success-title { font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 900; letter-spacing: 0.06em; color: var(--text-primary); margin-bottom: 10px; }
+  .success-title span { background: linear-gradient(135deg, var(--green-accent), var(--cyan-accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .success-sub { font-size: 13px; color: var(--text-muted); line-height: 1.7; letter-spacing: 0.04em; margin-bottom: 24px; max-width: 340px; margin-left: auto; margin-right: auto; }
+  .citizen-id-display { display: inline-block; padding: 12px 24px; border-radius: 12px; background: rgba(140,60,255,0.06); border: 1px solid rgba(140,60,255,0.2); font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700; letter-spacing: 0.15em; color: var(--green-accent); margin-bottom: 28px; }
+  
+  .bottom-bar { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(180,120,255,0.08); animation: fadeUp 1s 0.9s cubic-bezier(0.16,1,0.3,1) both; }
+  .bottom-link { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim); text-decoration: none; transition: color 0.2s; white-space: nowrap; }
+  .bottom-link:hover { color: rgba(140,60,255,0.4); }
+  .dot-sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(140,60,255,0.15); flex-shrink: 0; }
+  .login-link-row { text-align: center; margin-top: 18px; font-size: 12px; color: var(--text-dim); letter-spacing: 0.08em; animation: fadeUp 0.8s 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+  .login-link-row a { color: rgba(139,61,255,0.7); text-decoration: none; font-weight: 600; letter-spacing: 0.1em; border-bottom: 1px solid rgba(139,61,255,0.2); transition: color 0.2s; }
+  .login-link-row a:hover { color: var(--purple-core); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @media (max-width: 480px) { .card { padding: 28px 22px; } .form-row { grid-template-columns: 1fr; gap: 0; } .wordmark { font-size: 24px; } .globe-img { width: 360px; height: 360px; } }
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="stars"></div>
+  <div class="nebula nebula-1"></div>
+  <div class="nebula nebula-2"></div>
+  <div class="nebula nebula-3"></div>
+  <div class="scanline"></div>
+  <div class="globe-wrap">
+    <div class="globe-ring">
+      <img class="globe-img" src="world.png.png" alt="Globe" />
+      <div class="orbital orbital-1"><div class="orbital-dot"></div></div>
+      <div class="orbital orbital-2"></div>
+    </div>
+  </div>
+</div>
+
+<div class="card-wrap">
+  <div class="card">
+
+    <div class="header">
+      <img src="Logo.png.png" alt="NexaVerse Logo" class="logo-img" />
+      <div class="wordmark">NEXA<span>VERSE</span></div>
+      <div class="tagline">The Global Digital Nation</div>
+      <div style="display:flex;justify-content:center;">
+        <div class="citizenship-badge">
+          <div class="badge-dot"></div>
+          Citizenship Application
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="steps" id="stepsBar">
+      <div class="step active" id="step-1">
+        <div class="step-circle">1</div>
+        <div class="step-label">Identity</div>
+      </div>
+      <div class="step-line" id="line-1"></div>
+      <div class="step" id="step-2">
+        <div class="step-circle">2</div>
+        <div class="step-label">Access</div>
+      </div>
+      <div class="step-line" id="line-2"></div>
+      <div class="step" id="step-3">
+        <div class="step-circle">3</div>
+        <div class="step-label">Confirm</div>
+      </div>
+    </div>
+
+    <div class="form-panel active" id="panel-1">
+      <div class="panel-title">Personal Identity</div>
+      <div class="panel-sub">Enter your real world details. This information is encrypted and secured by NexaVerse protocols.</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="first-name">First Name</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(180,130,255,0.8)" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input id="first-name" type="text" placeholder="First name" autocomplete="given-name" spellcheck="false">
+            <div class="input-line"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="last-name">Last Name</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(180,130,255,0.8)" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input id="last-name" type="text" placeholder="Last name" autocomplete="family-name" spellcheck="false">
+            <div class="input-line"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(180,130,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <input id="email" type="email" placeholder="citizen@nexaverse.io" autocomplete="email" spellcheck="false">
+          <div class="input-line"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="nation">Nation of Origin</label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(180,130,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <select id="nation">
+            <option value="" disabled selected>Select your nation</option>
+            <option>Nigeria</option>
+            <option>United States</option>
+            <option>United Kingdom</option>
+            <option>Canada</option>
+            <option>Germany</option>
+            <option>France</option>
+            <option>India</option>
+            <option>Brazil</option>
+            <option>Australia</option>
+            <option>South Africa</option>
+            <option>Kenya</option>
+            <option>Ghana</option>
+            <option>Other</option>
+          </select>
+          <div class="input-line"></div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-next" onclick="goToPanel(2)">
+          Next — Access Setup →
+        </button>
+      </div>
+    </div>
+
+    <div class="form-panel" id="panel-2">
+      <div class="panel-title">Access Credentials</div>
+      <div class="panel-sub">Create your unique Citizen ID and Security Key. These are your gateway into the NexaVerse nation.</div>
+
+      <div class="form-group">
+        <label for="citizen-id">Desired Citizen ID</label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(180,130,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2z"/></svg>
+          <input id="citizen-id" type="text" placeholder="e.g. AyubaNexa01" spellcheck="false" oninput="checkHandle(this)">
+          <div class="input-line"></div>
+        </div>
+        <div id="handle-msg" style="font-size:10px;letter-spacing:0.1em;margin-top:6px;padding-left:2px;color:var(--text-dim);"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="new-pwd">Security Key</label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(180,130,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input id="new-pwd" type="password" placeholder="Min. 8 characters" autocomplete="new-password" oninput="checkStrength(this.value)">
+          <div class="input-line"></div>
+          <button class="pwd-toggle" type="button" onclick="togglePwd('new-pwd','eye1')" aria-label="Toggle">
+            <svg id="eye1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <div class="pwd-strength">
+          <div class="strength-bar" id="bar1"></div>
+          <div class="strength-bar" id="bar2"></div>
+          <div class="strength-bar" id="bar3"></div>
+          <div class="strength-bar" id="bar4"></div>
+          <span class="strength-label" id="strengthLabel">—</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirm-pwd">Confirm Security Key</label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(180,130,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input id="confirm-pwd" type="password" placeholder="Re-enter your key" autocomplete="new-password" oninput="checkMatch()">
+          <div class="input-line"></div>
+          <button class="pwd-toggle" type="button" onclick="togglePwd('confirm-pwd','eye2')" aria-label="Toggle">
+            <svg id="eye2" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <div id="match-msg" style="font-size:10px;letter-spacing:0.1em;margin-top:6px;padding-left:2px;"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="goToPanel(1)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+        <button class="btn-next" onclick="goToPanel(3)">
+          Next — Review →
+        </button>
+      </div>
+    </div>
+
+    <!-- PANEL 3: CONFIRM -->
+    <div class="form-panel" id="panel-3">
+      <div class="panel-title">Final Confirmation</div>
+      <div class="panel-sub">Review your citizenship application and agree to NexaVerse protocols before submission.</div>
+
+      <div style="background:rgba(140,60,255,0.04);border:1px solid rgba(140,60,255,0.12);border-radius:14px;padding:16px 18px;margin-bottom:18px;">
+        <div style="font-size:9px;font-weight:600;letter-spacing:0.25em;color:var(--text-dim);text-transform:uppercase;margin-bottom:12px;">Application Summary</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <div style="font-size:9px;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;margin-bottom:3px;">Full Name</div>
+            <div id="summary-name" style="font-size:13px;font-weight:600;color:var(--text-primary);letter-spacing:0.04em;">—</div>
+          </div>
+          <div>
+            <div style="font-size:9px;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;margin-bottom:3px;">Citizen ID</div>
+            <div id="summary-id" style="font-size:13px;font-weight:700;color:var(--green-accent);font-family:'Orbitron',monospace;letter-spacing:0.06em;">—</div>
+          </div>
+          <div>
+            <div style="font-size:9px;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;margin-bottom:3px;">Email</div>
+            <div id="summary-email" style="font-size:12px;font-weight:500;color:var(--text-muted);letter-spacing:0.04em;">—</div>
+          </div>
+          <div>
+            <div style="font-size:9px;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;margin-bottom:3px;">Nation</div>
+            <div id="summary-nation" style="font-size:12px;font-weight:500;color:var(--text-muted);letter-spacing:0.04em;">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="referral">Referral Code <span style="color:var(--text-dim);font-size:9px;">(Optional)</span></label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(180,130,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <input id="referral" type="text" placeholder="Enter referral code" spellcheck="false">
+          <div class="input-line"></div>
+        </div>
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" id="terms">
+        <label class="check-label" for="terms">I agree to the <a href="#">Terms of Nation</a> and <a href="#">NexaVerse Protocols</a>. I understand my digital citizenship rights and responsibilities.</label>
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" id="privacy">
+        <label class="check-label" for="privacy">I accept the <a href="#">Privacy Protocol</a>. My data is encrypted and will never be sold to third parties.</label>
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" id="updates">
+        <label class="check-label" for="updates">Send me NexaVerse nation updates, new features, and citizenship announcements. (Optional)</label>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="goToPanel(2)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+        <button class="btn-submit" onclick="submitApplication()">
+          Submit Application
+        </button>
+      </div>
+    </div>
+
+    <!-- SUCCESS PANEL -->
+    <div class="success-panel" id="success-panel">
+      <div class="success-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--green-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <div class="success-title">Welcome to the <span>Nation</span></div>
+      <div class="success-sub">Your citizenship application has been submitted successfully. Your Citizen ID is:</div>
+      <div class="citizen-id-display" id="final-citizen-id">NEXA-000000</div>
+      <div class="success-sub" style="font-size:11px;margin-bottom:28px;">Check your email for your confirmation and next steps to activate your full citizenship access.</div>
+      <a href="dashboard.html" class="btn-login-now">Enter The Nation →</a>
+    </div>
+
+  </div>
+
+  <div class="login-link-row" id="loginLinkRow">
+    Already a citizen? <a href="login.html">Sign in here</a>
+  </div>
+
+  <div class="bottom-bar">
+    <a href="#" class="bottom-link">Privacy Protocol</a>
+    <div class="dot-sep"></div>
+    <a href="#" class="bottom-link">Terms of Nation</a>
+    <div class="dot-sep"></div>
+    <a href="#" class="bottom-link">Support</a>
+  </div>
+</div>
+
+<script>
+  let currentPanel = 1;
+
+  function goToPanel(n) {
+    document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + n).classList.add('active');
+    for (let i = 1; i <= 3; i++) {
+      const step = document.getElementById('step-' + i);
+      step.classList.remove('active', 'done');
+      if (i < n) step.classList.add('done');
+      if (i === n) step.classList.add('active');
+    }
+    for (let i = 1; i <= 2; i++) {
+      const line = document.getElementById('line-' + i);
+      line.classList.toggle('done', i < n);
+    }
+    if (n === 3) fillSummary();
+    currentPanel = n;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function fillSummary() {
+    const first = document.getElementById('first-name').value || '—';
+    const last  = document.getElementById('last-name').value || '—';
+    const email  = document.getElementById('email').value || '—';
+    const nation = document.getElementById('nation').value || '—';
+    const cid    = document.getElementById('citizen-id').value || '—';
+    document.getElementById('summary-name').textContent   = first + ' ' + last;
+    document.getElementById('summary-email').textContent  = email;
+    document.getElementById('summary-nation').textContent = nation;
+    document.getElementById('summary-id').textContent     = cid || '—';
+  }
+
+  function submitApplication() {
+    const terms   = document.getElementById('terms').checked;
+    const privacy = document.getElementById('privacy').checked;
+    if (!terms || !privacy) {
+      alert('Please accept the Terms of Nation and Privacy Protocol to continue.');
+      return;
+    }
+    document.getElementById('stepsBar').style.display = 'none';
+    document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('loginLinkRow').style.display = 'none';
+    const cid = document.getElementById('citizen-id').value || 'Citizen';
+    const uid = 'NXV-' + Math.random().toString(36).substring(2,6).toUpperCase() + '-' + Math.floor(Math.random()*9000+1000);
+    document.getElementById('final-citizen-id').textContent = uid;
+    document.getElementById('success-panel').classList.add('active');
+  }
+
+  function checkStrength(val) {
+    const bars = ['bar1','bar2','bar3','bar4'];
+    const label = document.getElementById('strengthLabel');
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const classes = ['weak','weak','medium','strong'];
+    const labels  = ['—','Weak','Fair','Strong'];
+    const colors  = ['var(--text-dim)','#ff4455','#ffaa00','var(--green-accent)'];
+    bars.forEach((id, i) => {
+      const el = document.getElementById(id);
+      el.className = 'strength-bar';
+      if (i < score) el.classList.add(score <= 1 ? 'weak' : score === 2 ? 'medium' : 'strong');
+    });
+    label.textContent = labels[score] || '—';
+    label.style.color = colors[score] || 'var(--text-dim)';
+  }
+
+  function checkMatch() {
+    const p1 = document.getElementById('new-pwd').value;
+    const p2 = document.getElementById('confirm-pwd').value;
+    const msg = document.getElementById('match-msg');
+    if (!p2) { msg.textContent = ''; return; }
+    if (p1 === p2) {
+      msg.textContent = '✓ Keys match';
+      msg.style.color = 'var(--green-accent)';
+    } else {
+      msg.textContent = '✗ Keys do not match';
+      msg.style.color = '#ff4455';
+    }
+  }
+
+  function checkHandle(input) {
+    const val = input.value;
+    const msg = document.getElementById('handle-msg');
+    if (!val) { msg.textContent = ''; return; }
+    if (val.length < 4) {
+      msg.textContent = 'Minimum 4 characters required';
+      msg.style.color = '#ff4455';
+    } else if (/\s/.test(val)) {
+      msg.textContent = 'No spaces allowed in Citizen ID';
+      msg.style.color = '#ffaa00';
+    } else {
+      msg.textContent = '✓ ' + val + ' is available';
+      msg.style.color = 'var(--green-accent)';
+    }
+  }
+
+  function togglePwd(inputId, iconId) {
+    const inp = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    const isHidden = inp.type === 'password';
+    inp.type = isHidden ? 'text' : 'password';
+    icon.innerHTML = isHidden
+      ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`
+      : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+  }
+</script>
+</body>
+</html>

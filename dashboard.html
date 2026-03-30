@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NexaVerse | Super App</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --void-bg: #090314;
+      --app-bg: #140b2e;
+      --glass-surface: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(180, 100, 255, 0.2);
+      --glass-border-hover: rgba(180, 100, 255, 0.5);
+      --neon-purple: #ae52ff;
+      --neon-cyan: #00e5ff;
+      --neon-fuchsia: #e340ff;
+      --text-main: #ffffff;
+      --text-muted: #a092b1;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--void-bg);
+      font-family: 'Rajdhani', sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(174, 82, 255, 0.1), transparent 30%),
+        radial-gradient(circle at 85% 30%, rgba(0, 229, 255, 0.05), transparent 30%);
+    }
+
+    .stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(1px 1px at 30% 20%, rgba(255, 255, 255, 0.8), transparent),
+                  radial-gradient(1.5px 1.5px at 70% 60%, rgba(180, 130, 255, 0.6), transparent);
+      background-size: 120px 120px;
+    }
+
+    .app-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 480px;
+      background: linear-gradient(180deg, #100826 0%, #0a0412 100%);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .app-content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-bottom: 110px; /* Important for giving space for the bottom nav */
+      scrollbar-width: none;
+    }
+    .app-content::-webkit-scrollbar { display: none; }
+
+    /* Top Orb */
+    .hero-orb-section {
+      width: 100%;
+      height: 140px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      margin-top: 20px;
+    }
+
+    .nexa-logo {
+      height: 100px;
+      width: auto;
+      animation: floatLogo 4s ease-in-out infinite;
+      filter: drop-shadow(0 0 15px rgba(174, 82, 255, 0.5));
+    }
+
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Crypto Live Ticker */
+    .ticker-wrapper {
+      width: 100%;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.2);
+      border-top: 1px solid var(--glass-border);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 8px 0;
+      margin-top: 5px;
+      margin-bottom: 20px;
+      display: flex;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .ticker-content {
+      display: flex;
+      animation: scrollTicker 20s linear infinite;
+    }
+    
+    .ticker-content:hover {
+      animation-play-state: paused;
+    }
+
+    .ticker-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding-right: 30px;
+    }
+
+    .ticker-symbol { color: var(--text-main); font-weight: 700; }
+    .ticker-price { color: var(--neon-cyan); text-shadow: 0 0 5px rgba(0, 229, 255, 0.3); }
+    .ticker-up { color: #00ff88; font-size: 11px; }
+    .ticker-down { color: #ff3366; font-size: 11px; }
+    .ticker-nexa { color: var(--neon-fuchsia); text-shadow: 0 0 5px rgba(227, 64, 255, 0.4); }
+
+    @keyframes scrollTicker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Search Bar */
+    .search-wrapper { margin: 0 20px 20px 20px; }
+    .search-bar {
+      width: 100%;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.05);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .search-bar:focus-within {
+      border-color: var(--neon-purple);
+      box-shadow: 0 0 15px rgba(174, 82, 255, 0.2);
+    }
+    .search-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .search-bar input::placeholder { color: var(--text-muted); }
+    .search-bar i { color: var(--neon-purple); font-size: 16px; }
+
+    /* Blockchain Section */
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 0 24px 15px 24px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px 12px;
+      padding: 0 20px 20px 20px;
+    }
+
+    .app-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .app-card:hover { transform: translateY(-3px) scale(1.02); }
+
+    .icon-box {
+      width: 65px;
+      height: 65px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+    .app-card:hover .icon-box {
+      border-color: var(--neon-purple);
+      box-shadow: 0 0 20px rgba(174, 82, 255, 0.4), inset 0 0 10px rgba(174, 82, 255, 0.2);
+    }
+    
+    /* Dedicated gradients for the icons to make them pop uniquely */
+    .grad-cyan { background: linear-gradient(135deg, #00e5ff, #0088ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .grad-purple { background: linear-gradient(135deg, #ae52ff, #7f00ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .grad-fuchsia { background: linear-gradient(135deg, #ff0077, #e340ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .grad-mixed { background: linear-gradient(135deg, #00e5ff, #ae52ff, #e340ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+    .app-icon {
+      font-size: 26px;
+      transition: transform 0.3s, filter 0.3s;
+    }
+    .app-card:hover .app-icon {
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
+    }
+
+    .app-name {
+      font-size: 11px;
+      text-align: center;
+      line-height: 1.2;
+      color: var(--text-main);
+      font-weight: 500;
+      max-width: 76px;
+    }
+
+    /* Bottom Navigation - Fixed within the App Container */
+    .bottom-nav-container {
+      position: absolute;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 40px);
+      height: 70px;
+      background: rgba(18, 10, 35, 0.85); /* Slightly darker for contrast */
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(180, 100, 255, 0.3);
+      border-radius: 35px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 15px;
+      z-index: 100;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      color: var(--text-muted);
+      cursor: pointer;
+      width: 50px;
+      transition: color 0.2s;
+    }
+    .nav-item:hover, .nav-item.active { color: var(--text-main); }
+    .nav-item.active i { color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
+    .nav-item i { font-size: 18px; }
+    .nav-item span { font-size: 10px; font-weight: 600; }
+
+    /* Centered floating AI button */
+    .nav-ai-btn {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-fuchsia));
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform: translateY(-22px);
+      border: 3px solid #100826;
+      box-shadow: 0 10px 20px rgba(174, 82, 255, 0.4), 0 0 15px rgba(174, 82, 255, 0.6);
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      z-index: 110;
+    }
+    .nav-ai-btn:hover {
+      transform: translateY(-25px) scale(1.05);
+      box-shadow: 0 15px 25px rgba(174, 82, 255, 0.6), 0 0 25px rgba(227, 64, 255, 0.8);
+    }
+    .nav-ai-btn span {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 20px;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+      letter-spacing: 1px;
+    }
+
+    /* Responsive phone frame for desktop view */
+    @media (min-width: 481px) {
+      .app-container {
+        height: 85vh;
+        max-height: 850px;
+        border-radius: 40px;
+        border: 4px solid #2a1f40;
+        box-shadow: 0 25px 70px rgba(0,0,0,0.8), 0 0 0 8px #080410;
+      }
+      .app-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 140px;
+        height: 28px;
+        background: #080410;
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
+        z-index: 1000;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stars"></div>
+
+  <div class="app-container">
+    
+    <!-- All scrollable content goes inside here -->
+    <div class="app-content">
+      
+      <!-- Top Animated Logo -->
+      <div class="hero-orb-section">
+        <img src="Logo.png.png" alt="Nexaverse Logo" class="nexa-logo">
+      </div>
+
+      <!-- Live Crypto Ticker -->
+      <div class="ticker-wrapper">
+        <div class="ticker-content" id="cryptoTicker">
+          <!-- Fallback/Initial Loading State -->
+          <div class="ticker-item"><span class="ticker-symbol">BTC</span> <span class="ticker-price">Loading...</span></div>
+          <div class="ticker-item"><span class="ticker-symbol">ETH</span> <span class="ticker-price">Loading...</span></div>
+          <div class="ticker-item"><span class="ticker-symbol ticker-nexa">NEXA</span> <span class="ticker-price">Loading...</span></div>
+          <div class="ticker-item"><span class="ticker-symbol">SOL</span> <span class="ticker-price">Loading...</span></div>
+          <div class="ticker-item"><span class="ticker-symbol">BNB</span> <span class="ticker-price">Loading...</span></div>
+          <!-- Duplicated for scrolling -->
+          <div class="ticker-item"><span class="ticker-symbol">BTC</span> <span class="ticker-price">Loading...</span></div>
+          <div class="ticker-item"><span class="ticker-symbol">ETH</span> <span class="ticker-price">Loading...</span></div>
+          <div class="ticker-item"><span class="ticker-symbol ticker-nexa">NEXA</span> <span class="ticker-price">Loading...</span></div>
+          <div class="ticker-item"><span class="ticker-symbol">SOL</span> <span class="ticker-price">Loading...</span></div>
+          <div class="ticker-item"><span class="ticker-symbol">BNB</span> <span class="ticker-price">Loading...</span></div>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-wrapper">
+        <div class="search-bar">
+          <input type="text" placeholder="Search Nexaverse..">
+          <i class="fas fa-search"></i>
+        </div>
+      </div>
+
+      <!-- Blockchain Section -->
+      <div class="section-title">Nexa Blockchain</div>
+      
+      <div class="app-grid">
+        <!-- Row 1 -->
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-wallet app-icon grad-purple"></i></div>
+          <div class="app-name">Nexa Wallet</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-shield-alt app-icon grad-cyan"></i></div>
+          <div class="app-name">Nexa Bank</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-globe app-icon grad-fuchsia"></i></div>
+          <div class="app-name">Web Assistant</div>
+        </div>
+        
+        <!-- Row 2 -->
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-cloud-upload-alt app-icon grad-mixed"></i></div>
+          <div class="app-name">Nexa Market</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-map-marked-alt app-icon grad-cyan"></i></div>
+          <div class="app-name">Nexa Earth Map Innovation</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-user-lock app-icon grad-purple"></i></div>
+          <div class="app-name">Nexa Personal Wall</div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-network-wired app-icon grad-cyan"></i></div>
+          <div class="app-name">Nexa Digital Family</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-fingerprint app-icon grad-mixed"></i></div>
+          <div class="app-name">Digital AI Voting</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-tv app-icon grad-purple"></i></div>
+          <div class="app-name">Nexa Live TV</div>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-futbol app-icon grad-cyan"></i></div>
+          <div class="app-name">LiveScore Sports</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-hospital-symbol app-icon grad-fuchsia"></i></div>
+          <div class="app-name">Digital Hospital</div>
+        </div>
+
+        <!-- Row 5 & 6 & 7 (New Additions) -->
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-graduation-cap app-icon grad-purple"></i></div>
+          <div class="app-name">Nexa School</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-envelope app-icon grad-cyan"></i></div>
+          <div class="app-name">Nexa Email</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-newspaper app-icon grad-mixed"></i></div>
+          <div class="app-name">Nexa Live News</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-users app-icon grad-fuchsia"></i></div>
+          <div class="app-name">Nexa Social</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-chart-pie app-icon grad-mixed"></i></div>
+          <div class="app-name">Nexa Forex</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-project-diagram app-icon grad-cyan"></i></div>
+          <div class="app-name">Nexa Workflow</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-dice app-icon grad-purple"></i></div>
+          <div class="app-name">Nexa Bet</div>
+        </div>
+      </div>
+    
+    </div> <!-- /app-content -->
+
+    <!-- Bottom Navigation Bar - Now firmly pinned to bottom of container -->
+    <div class="bottom-nav-container">
+      <div class="nav-item active">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-store"></i>
+        <span>Market</span>
+      </div>
+      
+      <!-- AI Button Center -->
+      <div class="nav-ai-btn">
+        <span>AI</span>
+      </div>
+
+      <div class="nav-item">
+        <i class="far fa-comment-dots"></i>
+        <span>Chat</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-wallet"></i>
+        <span>Wallet</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Live Crypto Fetch Logic
+    async function fetchCryptoData() {
+      try {
+        // Fetch major coins from Binance API
+        const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT"]');
+        const data = await res.json();
+        
+        const prices = {};
+        data.forEach(item => {
+          prices[item.symbol] = {
+            price: parseFloat(item.lastPrice).toLocaleString('en-US', { style: 'currency', currency: 'USD' }),
+            change: parseFloat(item.priceChangePercent).toFixed(2),
+            up: parseFloat(item.priceChangePercent) >= 0
+          };
+        });
+        
+        // Mock specific highly-volatile NexaCoin Data
+        const nexaFluctuation = (Math.random() * 0.1 - 0.02).toFixed(4); // simulate live movement
+        prices['NEXAUSDT'] = { 
+          price: '$1.' + Math.floor(40 + Math.random() * 5), 
+          change: (12.50 + parseFloat(nexaFluctuation)).toFixed(2), 
+          up: true 
+        };
+        
+        const symbolsMap = {
+          'BTCUSDT': 'BTC',
+          'ETHUSDT': 'ETH',
+          'NEXAUSDT': 'NEXA',
+          'SOLUSDT': 'SOL',
+          'BNBUSDT': 'BNB'
+        };
+
+        const generateTickerHtml = () => {
+          let html = '';
+          Object.keys(symbolsMap).forEach(sym => {
+            const info = prices[sym];
+            const symName = symbolsMap[sym];
+            const colorClass = info.up ? 'ticker-up' : 'ticker-down';
+            const arrow = info.up ? '▲' : '▼';
+            const nexaClass = symName === 'NEXA' ? 'ticker-nexa' : '';
+            html += `<div class="ticker-item"><span class="ticker-symbol ${nexaClass}">${symName}</span> <span class="ticker-price">${info.price}</span> <span class="${colorClass}">${arrow} ${Math.abs(info.change)}%</span></div>`;
+          });
+          return html;
+        };
+
+        const tickerContent = document.getElementById('cryptoTicker');
+        const contentHtml = generateTickerHtml();
+        // Duplicate content so it scrolls seamlessly without breaking
+        tickerContent.innerHTML = contentHtml + contentHtml;
+      } catch (e) {
+        console.log('Crypto API Error:', e);
+      }
+    }
+    
+    // Initialize Fetch Pipeline
+    document.addEventListener('DOMContentLoaded', fetchCryptoData);
+    setInterval(fetchCryptoData, 15000); // Live update every 15 seconds
+  </script>
+</body>
+</html>

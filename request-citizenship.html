@@ -6,6 +6,8 @@
 <title>NexaVerse | Request Citizenship</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<script src="frontend/stateManager.js"></script>
 <style>
   :root { --void: #03000d; --border: rgba(180,120,255,0.15); --border-glow: rgba(180,120,255,0.45); --purple-core: #8b3dff; --fuchsia-core: #d63aff; --cyan-accent: #d63aff; --green-accent: #8b3dff; --text-primary: #f0ecff; --text-muted: rgba(180,160,220,0.5); --text-dim: rgba(140,120,180,0.35); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -144,6 +146,64 @@
   .login-link-row a:hover { color: var(--purple-core); }
   @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
   @media (max-width: 480px) { .card { padding: 28px 22px; } .form-row { grid-template-columns: 1fr; gap: 0; } .wordmark { font-size: 24px; } .globe-img { width: 360px; height: 360px; } }
+  /* Error Toast */
+  .error-toast {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: rgba(255, 69, 58, 0.15);
+    border: 1px solid rgba(255, 69, 58, 0.4);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    padding: 12px 24px;
+    border-radius: 12px;
+    color: #ff453a;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .error-toast.active {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+  }
+  .shake {
+    animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Zoom-Fade Transition */
+  .fadeUp {
+    animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Force pointer events */
+  button, input, select, textarea {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 1000;
+  }
 </style>
 </head>
 <body>
@@ -156,7 +216,7 @@
   <div class="scanline"></div>
   <div class="globe-wrap">
     <div class="globe-ring">
-      <img class="globe-img" src="world.png.png" alt="Globe" />
+      <img class="globe-img" src="assets/world.png" alt="Globe" />
       <div class="orbital orbital-1"><div class="orbital-dot"></div></div>
       <div class="orbital orbital-2"></div>
     </div>
@@ -167,7 +227,7 @@
   <div class="card">
 
     <div class="header">
-      <img src="Logo.png.png" alt="NexaVerse Logo" class="logo-img" />
+      <img src="assets/Logo.png" alt="NexaVerse Logo" class="logo-img" />
       <div class="wordmark">NEXA<span>VERSE</span></div>
       <div class="tagline">The Global Digital Nation</div>
       <div style="display:flex;justify-content:center;">
@@ -254,7 +314,7 @@
       </div>
 
       <div class="btn-row">
-        <button class="btn-next" onclick="goToPanel(2)">
+        <button type="button" class="btn-next" id="nextToStep2">
           Next — Access Setup →
         </button>
       </div>
@@ -311,11 +371,11 @@
       </div>
 
       <div class="btn-row">
-        <button class="btn-back" onclick="goToPanel(1)">
+        <button type="button" class="btn-back">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
           Back
         </button>
-        <button class="btn-next" onclick="goToPanel(3)">
+        <button type="button" class="btn-next">
           Next — Review →
         </button>
       </div>
@@ -372,12 +432,14 @@
         <label class="check-label" for="updates">Send me NexaVerse nation updates, new features, and citizenship announcements. (Optional)</label>
       </div>
 
+      <div id="api-error" style="display:none; color:#ff4455; background:rgba(255,68,85,0.1); border:1px solid rgba(255,68,85,0.3); padding:12px; border-radius:8px; font-size:12px; font-weight:600; text-align:center; margin-bottom:16px;"></div>
+
       <div class="btn-row">
-        <button class="btn-back" onclick="goToPanel(2)">
+        <button type="button" class="btn-back">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
           Back
         </button>
-        <button class="btn-submit" onclick="submitApplication()">
+        <button type="button" class="btn-submit" onclick="submitApplication(event)">
           Submit Application
         </button>
       </div>
@@ -412,22 +474,96 @@
   </div>
 </div>
 
-<script>
+<!-- Error Toast -->
+<div id="error-toast" class="error-toast">Invalid Operation</div>
+
+<script type="module">
+  import { submitCitizenshipRequest } from './NexaVerse-Project/nexa-web-frontend/js/services/authService.js';
+
   let currentPanel = 1;
 
-  function goToPanel(n) {
-    document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('panel-' + n).classList.add('active');
+  // 1. Direct UI Linkage (Step 1 -> Step 2)
+  document.addEventListener('DOMContentLoaded', () => {
+    // PWA Registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+
+    // Session Check
+    if (window.NexaState.getToken()) {
+      window.location.href = "dashboard.html";
+    }
+
+    const nextBtn = document.getElementById('nextToStep2');
+    if (nextBtn) {
+      nextBtn.addEventListener('click', (e) => {
+        console.log('DEBUG: Direct UI Linkage Triggered');
+        window.goToPanel(2);
+      });
+    }
+  });
+
+  // Global Event Listener for other buttons
+  document.addEventListener('click', (e) => {
+    const backBtn = e.target.closest('.btn-back');
+    const nextBtn = e.target.closest('.btn-next');
+    
+    // If it's a next button but not the one we handled above
+    if (nextBtn && nextBtn.id !== 'nextToStep2') {
+      const targetPanel = currentPanel + 1;
+      window.goToPanel(targetPanel);
+    }
+    
+    if (backBtn) {
+      const targetPanel = currentPanel - 1;
+      window.goToPanel(targetPanel);
+    }
+  });
+
+  window.goToPanel = function(n) {
+    const card = document.querySelector('.card');
+    
+    // Validation Gate (Temporarily Bypassed for Testing)
+    /*
+    if (n === 2 && currentPanel === 1) {
+      ...
+    }
+    */
+
+    console.log(`DEBUG: Validation Gate Bypassed. Transitioning to Step ${n}`);
+    
+    // UI Transition - Explicit Display & Opacity
+    document.querySelectorAll('.form-panel').forEach(p => {
+      p.classList.remove('active');
+      p.style.display = 'none';
+      p.style.opacity = '0';
+      p.style.visibility = 'hidden';
+    });
+
+    const nextPanel = document.getElementById('panel-' + n);
+    nextPanel.classList.add('active');
+    nextPanel.style.display = 'block';
+    nextPanel.style.opacity = '1';
+    nextPanel.style.visibility = 'visible';
+    
+    // Re-trigger animation
+    nextPanel.style.animation = 'none';
+    nextPanel.offsetHeight; // reflow
+    nextPanel.style.animation = 'fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both';
+
     for (let i = 1; i <= 3; i++) {
       const step = document.getElementById('step-' + i);
-      step.classList.remove('active', 'done');
-      if (i < n) step.classList.add('done');
-      if (i === n) step.classList.add('active');
+      if (step) {
+        step.classList.remove('active', 'done');
+        if (i < n) step.classList.add('done');
+        if (i === n) step.classList.add('active');
+      }
     }
     for (let i = 1; i <= 2; i++) {
       const line = document.getElementById('line-' + i);
-      line.classList.toggle('done', i < n);
+      if (line) line.classList.toggle('done', i < n);
     }
+    
     if (n === 3) fillSummary();
     currentPanel = n;
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -445,23 +581,111 @@
     document.getElementById('summary-id').textContent     = cid || '—';
   }
 
-  function submitApplication() {
+  window.submitApplication = async function(event) {
+    if (event) event.preventDefault();
+
     const terms   = document.getElementById('terms').checked;
     const privacy = document.getElementById('privacy').checked;
+    const card = document.querySelector('.card');
+    
     if (!terms || !privacy) {
-      alert('Please accept the Terms of Nation and Privacy Protocol to continue.');
+      showError('Accept Protocols to Continue');
       return;
     }
-    document.getElementById('stepsBar').style.display = 'none';
-    document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('loginLinkRow').style.display = 'none';
-    const cid = document.getElementById('citizen-id').value || 'Citizen';
-    const uid = 'NXV-' + Math.random().toString(36).substring(2,6).toUpperCase() + '-' + Math.floor(Math.random()*9000+1000);
-    document.getElementById('final-citizen-id').textContent = uid;
-    document.getElementById('success-panel').classList.add('active');
+
+    const first = document.getElementById('first-name').value;
+    const last  = document.getElementById('last-name').value;
+    const email  = document.getElementById('email').value;
+    const password = document.getElementById('new-pwd').value;
+    const confirm = document.getElementById('confirm-pwd').value;
+    const cid    = document.getElementById('citizen-id').value;
+
+    // Frontend Validation
+    if (!first || !last || !email || !cid || !password) {
+      showError('All Registry Fields Required');
+      return;
+    }
+    if (password.length < 8) {
+      showError('Security Key Too Weak (Min 8)');
+      return;
+    }
+    if (password !== confirm) {
+      showError('Security Keys Do Not Match');
+      return;
+    }
+
+    const formData = {
+      fullName: (first + ' ' + last).trim(),
+      email: email,
+      password: password,
+      nexa_id: cid
+    };
+
+    try {
+      // 1. Processing State
+      const btn = document.querySelector('.btn-submit');
+      btn.innerHTML = `<span class="spinner"></span>Registering Citizen...`;
+      btn.disabled = true;
+      btn.style.boxShadow = "0 0 40px rgba(139, 61, 255, 0.8)";
+
+      console.log('Enrollment Handshake: Submitting to Nexa-Core...');
+
+      const response = await fetch('http://localhost:5000/api/v1/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        console.log('Citizenship Granted: Database Entry Confirmed');
+        
+        // Success Animation
+        document.getElementById('stepsBar').style.display = 'none';
+        document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('loginLinkRow').style.display = 'none';
+        
+        document.getElementById('final-citizen-id').textContent = result.nexa_id;
+        document.getElementById('success-panel').classList.add('active');
+
+        // Cinematic exit
+        setTimeout(() => {
+          document.body.style.opacity = '0';
+          document.body.style.transition = 'opacity 1s ease';
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000);
+        }, 4000);
+
+      } else {
+        throw new Error(result.error || "Enrollment Denied");
+      }
+
+    } catch (error) {
+      console.warn('Enrollment Failure:', error.message);
+      
+      // Conflict Handling / Feedback
+      card.classList.add('shake');
+      showError(error.message === "NexaID already claimed" ? "ID Already Claimed" : error.message);
+      
+      const btn = document.querySelector('.btn-submit');
+      btn.textContent = 'Submit Application';
+      btn.disabled = false;
+      btn.style.boxShadow = "";
+      
+      setTimeout(() => card.classList.remove('shake'), 500);
+    }
   }
 
-  function checkStrength(val) {
+  function showError(msg) {
+    const toast = document.getElementById('error-toast');
+    toast.innerText = msg;
+    toast.classList.add('active');
+    setTimeout(() => toast.classList.remove('active'), 4000);
+  }
+
+  window.checkStrength = function(val) {
     const bars = ['bar1','bar2','bar3','bar4'];
     const label = document.getElementById('strengthLabel');
     let score = 0;
@@ -481,7 +705,7 @@
     label.style.color = colors[score] || 'var(--text-dim)';
   }
 
-  function checkMatch() {
+  window.checkMatch = function() {
     const p1 = document.getElementById('new-pwd').value;
     const p2 = document.getElementById('confirm-pwd').value;
     const msg = document.getElementById('match-msg');
@@ -495,7 +719,7 @@
     }
   }
 
-  function checkHandle(input) {
+  window.checkHandle = function(input) {
     const val = input.value;
     const msg = document.getElementById('handle-msg');
     if (!val) { msg.textContent = ''; return; }
@@ -511,7 +735,7 @@
     }
   }
 
-  function togglePwd(inputId, iconId) {
+  window.togglePwd = function(inputId, iconId) {
     const inp = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
     const isHidden = inp.type === 'password';

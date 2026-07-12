@@ -1,0 +1,35 @@
+{
+  "name": "NexaVerse",
+  "short_name": "Nexa",
+  "description": "The Global Digital Nation - Secure Web3 Ecosystem",
+  "start_url": "/login.html",
+  "display": "standalone",
+  "background_color": "#050508",
+  "theme_color": "#8b3dff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/Logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/Logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nexa Wallet",
+      "url": "/frontend/wallet.html",
+      "icons": [{ "src": "assets/Logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Citizen Registry",
+      "url": "/request-citizenship.html",
+      "icons": [{ "src": "assets/Logo.png", "sizes": "192x192" }]
+    }
+  ]
+}

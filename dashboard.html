@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>NexaVerse | Super App</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
+  <script src="frontend/stateManager.js"></script>
   <style>
     :root {
       --void-bg: #090314;
@@ -20,7 +25,25 @@
       --text-muted: #a092b1;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    @keyframes pulseBackground {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
 
     body {
       background: var(--void-bg);
@@ -30,9 +53,9 @@
       justify-content: center;
       align-items: center;
       overflow: hidden;
-      background-image: 
-        radial-gradient(circle at 15% 50%, rgba(174, 82, 255, 0.1), transparent 30%),
-        radial-gradient(circle at 85% 30%, rgba(0, 229, 255, 0.05), transparent 30%);
+      background: radial-gradient(circle at center, rgba(174, 82, 255, 0.15) 0%, rgba(9, 3, 20, 1) 100%);
+      background-size: 200% 200%;
+      animation: pulseBackground 15s ease infinite;
     }
 
     .stars {
@@ -40,15 +63,15 @@
       inset: 0;
       pointer-events: none;
       background: radial-gradient(1px 1px at 30% 20%, rgba(255, 255, 255, 0.8), transparent),
-                  radial-gradient(1.5px 1.5px at 70% 60%, rgba(180, 130, 255, 0.6), transparent);
+        radial-gradient(1.5px 1.5px at 70% 60%, rgba(180, 130, 255, 0.6), transparent);
       background-size: 120px 120px;
     }
 
     .app-container {
       position: relative;
       width: 100%;
-      height: 100%;
-      max-width: 480px;
+      height: 100vh;
+      margin: 0;
       background: linear-gradient(180deg, #100826 0%, #0a0412 100%);
       display: flex;
       flex-direction: column;
@@ -60,44 +83,363 @@
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
-      padding-bottom: 110px; /* Important for giving space for the bottom nav */
+      padding-bottom: 110px;
+      /* Important for giving space for the bottom nav */
       scrollbar-width: none;
     }
-    .app-content::-webkit-scrollbar { display: none; }
 
-    /* Top Orb */
-    .hero-orb-section {
+    .app-content::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Header */
+    .app-header {
       width: 100%;
-      height: 140px;
+      height: 70px;
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
-      position: relative;
-      margin-top: 20px;
+      padding: 0 20px;
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--glass-border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
 
     .nexa-logo {
-      height: 100px;
-      width: auto;
+      width: 40px;
+      height: auto;
+      margin-right: 20px;
+      flex-shrink: 0;
       animation: floatLogo 4s ease-in-out infinite;
-      filter: drop-shadow(0 0 15px rgba(174, 82, 255, 0.5));
+      filter: drop-shadow(0 0 15px rgba(174, 82, 255, 0.8)) drop-shadow(0 0 25px rgba(0, 229, 255, 0.6));
     }
 
+    /* Install Prompt */
+    .install-banner {
+      display: none;
+      background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
+      padding: 12px 20px;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 70px;
+      z-index: 49;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      backdrop-filter: blur(10px);
+    }
+
+    .install-btn {
+      background: #fff;
+      color: var(--void-bg);
+      border: none;
+      padding: 6px 15px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    /* Live Gold Ticker */
+    .gold-ticker {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 215, 0, 0.05);
+      border: 1px solid rgba(255, 215, 0, 0.2);
+      border-radius: 12px;
+      padding: 5px 12px;
+      margin-left: 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffd700;
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+    }
+
+    .gold-arrow { font-size: 10px; }
+    .gold-up { color: #00ff88; }
+    .gold-down { color: #ff3366; }
+
+    /* Notification Toast */
+    .nexa-toast {
+      position: fixed;
+      top: 20px;
+      right: -350px;
+      width: 300px;
+      background: rgba(15, 5, 25, 0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--neon-purple);
+      border-radius: 15px;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      z-index: 100000;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(174, 82, 255, 0.2);
+      transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .nexa-toast.show { right: 20px; }
+    .toast-icon { font-size: 1.5rem; color: var(--neon-purple); }
+    .toast-content { flex: 1; }
+    .toast-title { font-size: 11px; font-weight: 700; color: var(--neon-purple); text-transform: uppercase; margin-bottom: 3px; }
+    .toast-msg { font-size: 12px; color: #fff; line-height: 1.3; }
+
     @keyframes floatLogo {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    /* Status & Stories */
+    .status-stories-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 0 20px;
+      margin-top: 15px;
+      margin-bottom: 15px;
+      width: 100%;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+    }
+
+    .status-stories-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    .personal-status {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .status-avatar {
+      width: 45px;
+      height: 45px;
+      max-width: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+      margin-bottom: 8px;
+    }
+
+    .status-input {
+      background: var(--glass-surface);
+      border: none;
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 8px 15px;
+      color: var(--text-main);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      text-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
+      outline: none;
+      width: 130px;
+      text-align: center;
+      transition: background 0.3s;
+    }
+
+    .status-input:focus {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .status-input::placeholder {
+      color: var(--text-main);
+    }
+
+    /* Total Assets Widget */
+    .total-assets-widget {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: var(--glass-surface);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 10px 15px;
+      text-align: right;
+      z-index: 10;
+      opacity: 0;
+      animation: slowFadeIn 2.5s ease-out forwards;
+    }
+
+    .assets-crypto {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--neon-cyan);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .assets-fiat {
+      font-family: 'Rajdhani', sans-serif;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    @keyframes slowFadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app-header {
+        flex-direction: column;
+        height: auto;
+        padding: 12px 20px;
+        gap: 10px;
+      }
+      .nexa-logo {
+        margin-right: 0;
+      }
+      .total-assets-widget {
+        position: relative;
+        top: 0;
+        right: 0;
+        margin: 5px 20px 15px 20px;
+        transform: none;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .app-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 20px 10px !important;
+        padding: 10px 15px 120px 15px !important; /* Prevents overlap with bottom nav */
+      }
+      .app-card {
+        width: 100% !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+      }
+      .icon-box {
+        width: 52px !important;
+        height: 52px !important;
+        border-radius: 14px;
+        margin-bottom: 5px;
+      }
+      .app-icon {
+        font-size: 22px !important;
+      }
+      .app-name {
+        font-size: 9px !important;
+        line-height: 1.2 !important;
+        white-space: normal !important;
+        max-width: 100%;
+        text-align: center;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      /* Ensure the balance card sits below the profile */
+      div[style*="position: relative; width: 100%;"] {
+        display: flex;
+        flex-direction: column;
+      }
+      .status-stories-wrapper {
+        order: 1;
+        margin-bottom: 10px;
+      }
+      .total-assets-widget {
+        order: 2;
+        grid-column: span 4;
+        width: 100%;
+        margin: 10px 0;
+        box-sizing: border-box;
+      }
+    }
+
+    .stories-row {
+      display: flex;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .story-card {
+      width: 85px;
+      height: 100px;
+      border-radius: 12px;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.05);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .story-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(174, 82, 255, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+      border-color: var(--neon-purple);
+    }
+
+    .story-avatar {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 24px;
+      height: 24px;
+      max-width: 100%;
+      border-radius: 50%;
+      border: 1.5px solid var(--neon-fuchsia);
+      object-fit: cover;
+      z-index: 2;
+    }
+
+    .story-message {
+      font-size: 0.625rem;
+      font-weight: 500;
+      color: var(--text-main);
+      text-align: center;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      position: relative;
+      z-index: 2;
+      line-height: 1.25;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     /* Crypto Live Ticker */
     .ticker-wrapper {
-      width: 100%;
+      flex: 1;
       overflow: hidden;
-      background: rgba(0, 0, 0, 0.2);
-      border-top: 1px solid var(--glass-border);
-      border-bottom: 1px solid var(--glass-border);
-      padding: 8px 0;
-      margin-top: 5px;
-      margin-bottom: 20px;
       display: flex;
       white-space: nowrap;
       position: relative;
@@ -107,7 +449,7 @@
       display: flex;
       animation: scrollTicker 20s linear infinite;
     }
-    
+
     .ticker-content:hover {
       animation-play-state: paused;
     }
@@ -122,36 +464,72 @@
       padding-right: 30px;
     }
 
-    .ticker-symbol { color: var(--text-main); font-weight: 700; }
-    .ticker-price { color: var(--neon-cyan); text-shadow: 0 0 5px rgba(0, 229, 255, 0.3); }
-    .ticker-up { color: #00ff88; font-size: 11px; }
-    .ticker-down { color: #ff3366; font-size: 11px; }
-    .ticker-nexa { color: var(--neon-fuchsia); text-shadow: 0 0 5px rgba(227, 64, 255, 0.4); }
+    .ticker-symbol {
+      color: var(--neon-cyan);
+      font-weight: 700;
+      text-shadow: 0 0 5px rgba(0, 229, 255, 0.3);
+    }
+
+    .ticker-price {
+      color: var(--neon-fuchsia);
+      text-shadow: 0 0 5px rgba(227, 64, 255, 0.4);
+    }
+
+    .ticker-up {
+      color: #00ff88;
+      font-size: 11px;
+    }
+
+    .ticker-down {
+      color: #ff3366;
+      font-size: 11px;
+    }
+
+    .ticker-nexa {
+      color: var(--neon-purple);
+      text-shadow: 0 0 5px rgba(174, 82, 255, 0.6);
+    }
 
     @keyframes scrollTicker {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-50%);
+      }
     }
 
     /* Search Bar */
-    .search-wrapper { margin: 0 20px 20px 20px; }
+    .search-wrapper {
+      max-width: 250px;
+      margin-top: 15px;
+      margin-bottom: 15px;
+      margin-left: 0;
+      margin-right: auto;
+      padding-left: 10px;
+    }
+
     .search-bar {
       width: 100%;
+      height: 35px;
       background: var(--glass-surface);
-      border: 1px solid var(--glass-border);
+      border: 0.5px solid var(--glass-border);
       border-radius: 20px;
-      padding: 14px 18px;
+      padding: 0 15px;
       display: flex;
       align-items: center;
       gap: 12px;
       backdrop-filter: blur(12px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.05);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.05);
       transition: border-color 0.3s, box-shadow 0.3s;
     }
+
     .search-bar:focus-within {
       border-color: var(--neon-purple);
       box-shadow: 0 0 15px rgba(174, 82, 255, 0.2);
     }
+
     .search-bar input {
       flex: 1;
       background: transparent;
@@ -159,11 +537,18 @@
       outline: none;
       color: var(--text-main);
       font-family: 'Rajdhani', sans-serif;
-      font-size: 15px;
+      font-size: 12px;
       font-weight: 500;
     }
-    .search-bar input::placeholder { color: var(--text-muted); }
-    .search-bar i { color: var(--neon-purple); font-size: 16px; }
+
+    .search-bar input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-bar i {
+      color: var(--neon-purple);
+      font-size: 12px;
+    }
 
     /* Blockchain Section */
     .section-title {
@@ -177,79 +562,110 @@
 
     .app-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px 12px;
-      padding: 0 20px 20px 20px;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 15px 10px;
+      padding: 0 15px 100px 15px;
     }
 
     .app-card {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
       transition: transform 0.2s;
     }
-    .app-card:hover { transform: translateY(-3px) scale(1.02); }
+
+    .app-card:hover {
+      transform: translateY(-3px) scale(1.02);
+    }
 
     .icon-box {
-      width: 65px;
-      height: 65px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%);
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%);
       border: 1px solid var(--glass-border);
       display: flex;
       justify-content: center;
       align-items: center;
       backdrop-filter: blur(10px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
       transition: all 0.3s ease;
     }
+
     .app-card:hover .icon-box {
       border-color: var(--neon-purple);
       box-shadow: 0 0 20px rgba(174, 82, 255, 0.4), inset 0 0 10px rgba(174, 82, 255, 0.2);
     }
-    
+
     /* Dedicated gradients for the icons to make them pop uniquely */
-    .grad-cyan { background: linear-gradient(135deg, #00e5ff, #0088ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-    .grad-purple { background: linear-gradient(135deg, #ae52ff, #7f00ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-    .grad-fuchsia { background: linear-gradient(135deg, #ff0077, #e340ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-    .grad-mixed { background: linear-gradient(135deg, #00e5ff, #ae52ff, #e340ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .grad-cyan {
+      background: linear-gradient(135deg, #00e5ff, #0088ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .grad-purple {
+      background: linear-gradient(135deg, #ae52ff, #7f00ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .grad-fuchsia {
+      background: linear-gradient(135deg, #ff0077, #e340ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .grad-mixed {
+      background: linear-gradient(135deg, #00e5ff, #ae52ff, #e340ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
     .app-icon {
-      font-size: 26px;
+      font-size: 18px;
       transition: transform 0.3s, filter 0.3s;
     }
+
     .app-card:hover .app-icon {
       transform: scale(1.1);
-      filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
     }
 
     .app-name {
-      font-size: 11px;
+      font-size: 10px;
       text-align: center;
-      line-height: 1.2;
+      line-height: 1.1;
       color: var(--text-main);
       font-weight: 500;
-      max-width: 76px;
+      max-width: 60px;
     }
 
     /* Bottom Navigation - Fixed within the App Container */
     .bottom-nav-container {
-      position: absolute;
-      bottom: 25px;
+      position: fixed;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      width: calc(100% - 40px);
-      height: 70px;
-      background: rgba(18, 10, 35, 0.85); /* Slightly darker for contrast */
-      backdrop-filter: blur(25px);
-      border: 1px solid rgba(180, 100, 255, 0.3);
-      border-radius: 35px;
+      width: calc(100% - 30px);
+      max-width: 800px;
+      height: 55px;
+      background: var(--glass-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: none;
+      border-top: 1px solid var(--neon-purple);
+      border-radius: 30px;
       display: flex;
-      justify-content: space-between;
+      justify-content: space-around;
       align-items: center;
-      padding: 0 15px;
+      padding: 0 5px;
       z-index: 100;
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.1);
     }
@@ -259,102 +675,366 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 3px;
       color: var(--text-muted);
       cursor: pointer;
       width: 50px;
       transition: color 0.2s;
     }
-    .nav-item:hover, .nav-item.active { color: var(--text-main); }
-    .nav-item.active i { color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
-    .nav-item i { font-size: 18px; }
-    .nav-item span { font-size: 10px; font-weight: 600; }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: var(--text-main);
+    }
+
+    .nav-item.active i {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+    }
+
+    .nav-item i {
+      font-size: 11.5px;
+    }
+
+    .nav-item span {
+      font-size: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Wallet Pulse & Transition Logic */
+    .nav-item.wallet-active i {
+      color: #00ff88;
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.6);
+      animation: navPulse 2s infinite;
+    }
+
+    @keyframes navPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
+    }
+
+    .transition-overlay {
+      position: fixed;
+      inset: 0;
+      background: #050508;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+      transform: scale(1.2);
+    }
+
+    .transition-active {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: all;
+    }
 
     /* Centered floating AI button */
     .nav-ai-btn {
       position: relative;
-      width: 64px;
-      height: 64px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--neon-purple), var(--neon-fuchsia));
       display: flex;
       justify-content: center;
       align-items: center;
-      transform: translateY(-22px);
+      transform: translateY(-8px);
       border: 3px solid #100826;
-      box-shadow: 0 10px 20px rgba(174, 82, 255, 0.4), 0 0 15px rgba(174, 82, 255, 0.6);
+      box-shadow: 0 6px 12px rgba(174, 82, 255, 0.4), 0 0 8px rgba(174, 82, 255, 0.6);
       cursor: pointer;
       transition: transform 0.3s, box-shadow 0.3s;
       z-index: 110;
     }
+
     .nav-ai-btn:hover {
-      transform: translateY(-25px) scale(1.05);
-      box-shadow: 0 15px 25px rgba(174, 82, 255, 0.6), 0 0 25px rgba(227, 64, 255, 0.8);
+      transform: translateY(-11px) scale(1.05);
+      box-shadow: 0 10px 18px rgba(174, 82, 255, 0.6), 0 0 15px rgba(227, 64, 255, 0.8);
     }
+
     .nav-ai-btn span {
       font-family: 'Orbitron', sans-serif;
       font-weight: 900;
-      font-size: 20px;
+      font-size: 13px;
       color: #fff;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
       letter-spacing: 1px;
     }
 
-    /* Responsive phone frame for desktop view */
-    @media (min-width: 481px) {
+    /* TRIPLE-LOCK SECURITY MODAL (DASHBOARD) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(25px);
+      z-index: 10000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.4s ease;
+    }
+
+    .modal {
+      background: #050508;
+      border: 1px solid var(--neon-purple);
+      border-radius: 30px;
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 350px;
+      text-align: center;
+      transform: scale(0.9);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 0 50px rgba(174, 82, 255, 0.4);
+    }
+
+    .modal.active { transform: scale(1); }
+
+    .modal-icon {
+      font-size: 3rem;
+      color: var(--neon-purple);
+      margin-bottom: 20px;
+      text-shadow: 0 0 15px var(--neon-purple);
+    }
+
+    .modal-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    /* 6-DIGIT PIN INPUT STYLES */
+    .pin-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 25px 0;
+    }
+
+    .pin-box {
+      width: 40px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      color: var(--neon-purple);
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .pin-box:focus {
+      border-color: var(--neon-purple);
+      box-shadow: 0 0 15px rgba(174, 82, 255, 0.3);
+      background: rgba(174, 82, 255, 0.05);
+    }
+
+    .auth-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .auth-method {
+      padding: 15px 5px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .auth-method:hover {
+      border-color: var(--neon-purple);
+      background: rgba(174, 82, 255, 0.1);
+    }
+
+    .auth-method i {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      display: block;
+      color: var(--neon-purple);
+    }
+
+    .auth-method span {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .grad-purple {
+      color: var(--neon-purple) !important;
+      filter: drop-shadow(0 0 8px var(--neon-purple));
+    }
+
+    /* Desktop Architecture Expansion */
+    @media (min-width: 768px) {
       .app-container {
-        height: 85vh;
-        max-height: 850px;
-        border-radius: 40px;
-        border: 4px solid #2a1f40;
-        box-shadow: 0 25px 70px rgba(0,0,0,0.8), 0 0 0 8px #080410;
+        max-width: none;
       }
-      .app-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 140px;
-        height: 28px;
-        background: #080410;
-        border-bottom-left-radius: 16px;
-        border-bottom-right-radius: 16px;
-        z-index: 1000;
+
+      .app-content {
+        padding-bottom: 0;
+      }
+
+      .bottom-nav-container {
+        position: relative;
+        flex-direction: row;
+        width: 95%;
+        height: 65px;
+        max-width: 1000px;
+        margin: 40px auto 30px auto;
+        transform: none;
+        bottom: auto;
+        left: auto;
+        border-radius: 40px;
+        padding: 0 20px;
+      }
+
+      .nav-item {
+        margin: 0;
+        width: 60px;
+      }
+
+      .nav-item i {
+        font-size: 16px;
+      }
+
+      .nav-item span {
+        font-size: 10px;
+      }
+
+      .nav-ai-btn {
+        margin: 0;
+        transform: translateY(-8px);
+        width: 50px;
+        height: 50px;
+      }
+
+      .nav-ai-btn span {
+        font-size: 16px;
+      }
+
+      .nav-ai-btn:hover {
+        transform: translateY(-11px) scale(1.05);
+      }
+
+
+      .section-title {
+        font-size: 1.2rem;
+        margin: 0 0 30px 40px;
+      }
+
+      .app-header {
+        padding: 0 40px;
+      }
+
+      .status-stories-wrapper {
+        padding: 0 40px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+      }
+
+      .search-wrapper {
+        margin-left: 40px;
+        max-width: 400px;
+      }
+
+      .total-assets-widget {
+        right: 40px;
+        top: 25px;
+      }
+
+      .app-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 35px 25px;
+        padding: 0 40px 40px 40px;
+      }
+
+      /* UI Scaling +20% */
+      .app-icon {
+        font-size: 24px;
+      }
+
+      .app-name {
+        font-size: 0.85rem;
+        max-width: 100%;
+      }
+
+      .icon-box {
+        width: 60px;
+        height: 60px;
+        border-radius: 20px;
       }
     }
   </style>
 </head>
+
 <body>
+  <div class="transition-overlay" id="transitionOverlay"></div>
+  
+  <div class="nexa-toast" id="nexaToast">
+    <div class="toast-icon"><i class="fas fa-shield-check"></i></div>
+    <div class="toast-content">
+      <div class="toast-title">NEXA-CORE ALERT</div>
+      <div class="toast-msg">New Audited Transaction Detected.</div>
+    </div>
+  </div>
 
   <div class="stars"></div>
 
   <div class="app-container">
-    
+
     <!-- All scrollable content goes inside here -->
     <div class="app-content">
-      
-      <!-- Top Animated Logo -->
-      <div class="hero-orb-section">
-        <img src="Logo.png.png" alt="Nexaverse Logo" class="nexa-logo">
+
+      <!-- Integrated Header & Ticker -->
+      <header class="app-header">
+        <img src="assets/Logo.png" alt="Nexaverse Logo" class="nexa-logo">
+        <div class="gold-ticker" id="goldTicker">
+          <i class="fas fa-coins"></i>
+          <span>XAU: <span id="goldPriceDisplay">SYNCING...</span></span>
+          <span id="goldArrow" class="gold-arrow"></span>
+        </div>
+        <div class="ticker-wrapper">
+          <div class="ticker-content" id="cryptoTicker">
+            <div class="ticker-item"><span class="ticker-symbol ticker-nexa">NEXA</span> <span class="ticker-price">SYNCING...</span></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Install Prompt Banner -->
+      <div id="installBanner" class="install-banner">
+        <span>Install Nexa App for 0ms loading experience</span>
+        <button class="install-btn" id="installBtn">Install</button>
       </div>
 
-      <!-- Live Crypto Ticker -->
-      <div class="ticker-wrapper">
-        <div class="ticker-content" id="cryptoTicker">
-          <!-- Fallback/Initial Loading State -->
-          <div class="ticker-item"><span class="ticker-symbol">BTC</span> <span class="ticker-price">Loading...</span></div>
-          <div class="ticker-item"><span class="ticker-symbol">ETH</span> <span class="ticker-price">Loading...</span></div>
-          <div class="ticker-item"><span class="ticker-symbol ticker-nexa">NEXA</span> <span class="ticker-price">Loading...</span></div>
-          <div class="ticker-item"><span class="ticker-symbol">SOL</span> <span class="ticker-price">Loading...</span></div>
-          <div class="ticker-item"><span class="ticker-symbol">BNB</span> <span class="ticker-price">Loading...</span></div>
-          <!-- Duplicated for scrolling -->
-          <div class="ticker-item"><span class="ticker-symbol">BTC</span> <span class="ticker-price">Loading...</span></div>
-          <div class="ticker-item"><span class="ticker-symbol">ETH</span> <span class="ticker-price">Loading...</span></div>
-          <div class="ticker-item"><span class="ticker-symbol ticker-nexa">NEXA</span> <span class="ticker-price">Loading...</span></div>
-          <div class="ticker-item"><span class="ticker-symbol">SOL</span> <span class="ticker-price">Loading...</span></div>
-          <div class="ticker-item"><span class="ticker-symbol">BNB</span> <span class="ticker-price">Loading...</span></div>
+      <!-- Status & Stories Section Wrapper -->
+      <div style="position: relative; width: 100%;">
+
+        <!-- Pinned Asset Widget -->
+        <div class="total-assets-widget">
+          <div class="assets-crypto">SYNCING...</div>
+          <div class="assets-fiat">...</div>
         </div>
+
+        <!-- Status & Stories Scrolling Frame -->
+        <section class="status-stories-wrapper">
+          <div class="personal-status">
+            <img src="https://i.pravatar.cc/150?img=1" alt="Profile" class="status-avatar" id="userAvatar">
+            <input type="text" placeholder="Citizen Name" class="status-input" id="userNameDisplay">
+          </div>
+          <div class="stories-row" id="liveStoriesRow">
+            <!-- Dynamic Stories Only -->
+          </div>
+        </section>
       </div>
 
       <!-- Search Bar -->
@@ -367,10 +1047,10 @@
 
       <!-- Blockchain Section -->
       <div class="section-title">Nexa Blockchain</div>
-      
+
       <div class="app-grid">
         <!-- Row 1 -->
-        <div class="app-card">
+        <div class="app-card" onclick="console.log('Gatekeeper Clicked'); handleVaultGatekeeper(event)">
           <div class="icon-box"><i class="fas fa-wallet app-icon grad-purple"></i></div>
           <div class="app-name">Nexa Wallet</div>
         </div>
@@ -382,7 +1062,7 @@
           <div class="icon-box"><i class="fas fa-globe app-icon grad-fuchsia"></i></div>
           <div class="app-name">Web Assistant</div>
         </div>
-        
+
         <!-- Row 2 -->
         <div class="app-card">
           <div class="icon-box"><i class="fas fa-cloud-upload-alt app-icon grad-mixed"></i></div>
@@ -406,12 +1086,35 @@
           <div class="icon-box"><i class="fas fa-fingerprint app-icon grad-mixed"></i></div>
           <div class="app-name">Digital AI Voting</div>
         </div>
+
+        <!-- New App Section -->
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-taxi app-icon grad-mixed"></i></div>
+          <div class="app-name">Nexa Taxi</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box">
+            <img src="assets/camera_lens.png" alt="Nexa AI Shoot" class="app-icon"
+              style="width: 70%; height: 70%; object-fit: contain; border-radius: 50%;">
+          </div>
+          <div class="app-name">Nexa AI Shoot</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-shield-alt app-icon grad-cyan"></i></div>
+          <div class="app-name">Nexa Security Alert</div>
+        </div>
+        <div class="app-card">
+          <div class="icon-box"><i class="fas fa-comments app-icon grad-purple"></i></div>
+          <div class="app-name">Nexa Call/Chat</div>
+        </div>
+
+        <!-- Row 4 -->
         <div class="app-card">
           <div class="icon-box"><i class="fas fa-tv app-icon grad-purple"></i></div>
           <div class="app-name">Nexa Live TV</div>
         </div>
 
-        <!-- Row 4 -->
+        <!-- Row 5 -->
         <div class="app-card">
           <div class="icon-box"><i class="fas fa-futbol app-icon grad-cyan"></i></div>
           <div class="app-name">LiveScore Sports</div>
@@ -421,7 +1124,7 @@
           <div class="app-name">Digital Hospital</div>
         </div>
 
-        <!-- Row 5 & 6 & 7 (New Additions) -->
+        <!-- Row 6, 7 & 8 (New Additions) -->
         <div class="app-card">
           <div class="icon-box"><i class="fas fa-graduation-cap app-icon grad-purple"></i></div>
           <div class="app-name">Nexa School</div>
@@ -451,35 +1154,65 @@
           <div class="app-name">Nexa Bet</div>
         </div>
       </div>
-    
-    </div> <!-- /app-content -->
 
-    <!-- Bottom Navigation Bar - Now firmly pinned to bottom of container -->
-    <div class="bottom-nav-container">
-      <div class="nav-item active">
-        <i class="fas fa-home"></i>
-        <span>Home</span>
-      </div>
-      <div class="nav-item">
-        <i class="fas fa-store"></i>
-        <span>Market</span>
-      </div>
-      
-      <!-- AI Button Center -->
-      <div class="nav-ai-btn">
-        <span>AI</span>
+      <!-- Bottom Navigation Bar - Restructured specifically inside Main wrapper -->
+      <div class="bottom-nav-container">
+        <div class="nav-item active">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-store"></i>
+          <span>Market</span>
+        </div>
+
+        <!-- AI Button Center -->
+        <div class="nav-ai-btn">
+          <span>AI</span>
+        </div>
+
+        <div class="nav-item" onclick="console.log('Gatekeeper Clicked'); handleVaultGatekeeper(event)" id="navWalletItem" style="transition: all 0.4s;">
+          <i class="fas fa-wallet" style="filter: drop-shadow(0 0 5px var(--neon-purple));"></i>
+          <span>Wallet</span>
+        </div>
       </div>
 
-      <div class="nav-item">
-        <i class="far fa-comment-dots"></i>
-        <span>Chat</span>
-      </div>
-      <div class="nav-item">
-        <i class="fas fa-wallet"></i>
-        <span>Wallet</span>
-      </div>
-    </div>
+      <!-- SECURITY MODAL OVERLAY -->
+      <div id="securityOverlay" class="security-overlay" style="display: none; position: fixed; inset: 0; z-index: 10000; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(20px); align-items: center; justify-content: center;">
+        <div class="modal" id="securityModal">
+          <div class="modal-icon"><i class="fas fa-lock"></i></div>
+          <h3 class="modal-title">VAULT_AUTHORIZATION</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Enter 6-Digit Security PIN</p>
+          
+          <div class="pin-container" id="pinContainer">
+            <input type="password" maxlength="1" class="pin-box" oninput="handlePinInput(this, 0)" onkeydown="handlePinBack(this, 0)">
+            <input type="password" maxlength="1" class="pin-box" oninput="handlePinInput(this, 1)" onkeydown="handlePinBack(this, 1)">
+            <input type="password" maxlength="1" class="pin-box" oninput="handlePinInput(this, 2)" onkeydown="handlePinBack(this, 2)">
+            <input type="password" maxlength="1" class="pin-box" oninput="handlePinInput(this, 3)" onkeydown="handlePinBack(this, 3)">
+            <input type="password" maxlength="1" class="pin-box" oninput="handlePinInput(this, 4)" onkeydown="handlePinBack(this, 4)">
+            <input type="password" maxlength="1" class="pin-box" oninput="handlePinInput(this, 5)" onkeydown="handlePinInput(this, 5)">
+          </div>
 
+          <div class="auth-options">
+            <div class="auth-method" onclick="simulateHandshake('Touch ID')">
+              <i class="fas fa-fingerprint"></i>
+              <span>Touch ID</span>
+            </div>
+            <div class="auth-method" onclick="simulateHandshake('Face ID')">
+              <i class="fas fa-face-viewfinder"></i>
+              <span>Face ID</span>
+            </div>
+            <div class="auth-method" onclick="closeSecurityModal()">
+              <i class="fas fa-times"></i>
+              <span>Cancel</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- /app-grid -->
+
+  </div> <!-- /app-content -->
   </div>
 
   <script>
@@ -489,7 +1222,7 @@
         // Fetch major coins from Binance API
         const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT"]');
         const data = await res.json();
-        
+
         const prices = {};
         data.forEach(item => {
           prices[item.symbol] = {
@@ -497,16 +1230,16 @@
             change: parseFloat(item.priceChangePercent).toFixed(2),
             up: parseFloat(item.priceChangePercent) >= 0
           };
-        });
-        
+    
+
         // Mock specific highly-volatile NexaCoin Data
         const nexaFluctuation = (Math.random() * 0.1 - 0.02).toFixed(4); // simulate live movement
-        prices['NEXAUSDT'] = { 
-          price: '$1.' + Math.floor(40 + Math.random() * 5), 
-          change: (12.50 + parseFloat(nexaFluctuation)).toFixed(2), 
-          up: true 
+        prices['NEXAUSDT'] = {
+          price: '$1.' + Math.floor(40 + Math.random() * 5),
+          change: (12.50 + parseFloat(nexaFluctuation)).toFixed(2),
+          up: true
         };
-        
+
         const symbolsMap = {
           'BTCUSDT': 'BTC',
           'ETHUSDT': 'ETH',
@@ -524,7 +1257,7 @@
             const arrow = info.up ? '▲' : '▼';
             const nexaClass = symName === 'NEXA' ? 'ticker-nexa' : '';
             html += `<div class="ticker-item"><span class="ticker-symbol ${nexaClass}">${symName}</span> <span class="ticker-price">${info.price}</span> <span class="${colorClass}">${arrow} ${Math.abs(info.change)}%</span></div>`;
-          });
+      
           return html;
         };
 
@@ -532,14 +1265,209 @@
         const contentHtml = generateTickerHtml();
         // Duplicate content so it scrolls seamlessly without breaking
         tickerContent.innerHTML = contentHtml + contentHtml;
-      } catch (e) {
-        console.log('Crypto API Error:', e);
+    // 1. Reactive Polling Engine (Subscribed to StateManager)
+    // PWA Registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+
+    window.NexaState.subscribe((state) => { if (state.user) { document.getElementById('userNameDisplay').value = state.user.nexa_id; } if (state.balance) { updateDashboardBalanceUI(state); } if (state.goldRates) { updateGoldTicker(state.goldRates.usd_per_gram); } setWalletLockState(state.isVaultUnlocked); });
+
+
+    function updateDashboardBalanceUI(state) {
+      document.querySelector('.assets-crypto').innerText = `${state.balance} NEXA`;
+      if (state.goldRates) {
+        const fiatVal = (parseFloat(state.balance.replace(/,/g, '')) * state.goldRates.usd_per_gram).toLocaleString(undefined, { style: 'currency', currency: 'USD' });
+        document.querySelector('.assets-fiat').innerText = `${fiatVal} USD`;
       }
     }
-    
-    // Initialize Fetch Pipeline
-    document.addEventListener('DOMContentLoaded', fetchCryptoData);
-    setInterval(fetchCryptoData, 15000); // Live update every 15 seconds
+
+    function triggerBalanceAnimation(newBalance) {
+      const el = document.querySelector('.assets-crypto');
+      el.style.color = 'var(--neon-cyan)';
+      el.style.textShadow = '0 0 20px var(--neon-cyan)';
+      setTimeout(() => {
+        el.style.color = '';
+        el.style.textShadow = '';
+      }, 2000);
+    }
+
+    function updateGoldTicker(price) {
+      const display = document.getElementById('goldPriceDisplay');
+      const arrow = document.getElementById('goldArrow');
+      
+      display.innerText = `$${price.toFixed(2)}/g`;
+      
+      if (lastGoldPrice !== null) {
+        if (price > lastGoldPrice) {
+          arrow.innerHTML = '<i class="fas fa-caret-up"></i>';
+          arrow.className = 'gold-arrow gold-up';
+        } else if (price < lastGoldPrice) {
+          arrow.innerHTML = '<i class="fas fa-caret-down"></i>';
+          arrow.className = 'gold-arrow gold-down';
+        }
+      }
+      lastGoldPrice = price;
+    }
+
+    function setWalletLockState(unlocked) {
+      const walletItem = document.getElementById('navWalletItem');
+      const icon = walletItem.querySelector('i');
+      
+      if (unlocked) {
+        walletItem.classList.add('wallet-active');
+        walletItem.classList.remove('wallet-locked');
+        icon.className = 'fas fa-wallet';
+      } else {
+        walletItem.classList.remove('wallet-active');
+        walletItem.classList.add('wallet-locked');
+        icon.className = 'fas fa-lock';
+        // Red Pulse for Locked State
+        icon.style.color = '#ff3366';
+        icon.style.textShadow = '0 0 10px rgba(255, 51, 102, 0.6)';
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('nexaToast');
+      toast.querySelector('.toast-msg').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 5000);
+    }
+
+
+
+    // 2. The 'Exit-Wipe' Trigger
+    const exitDashboard = () => { sessionStorage.removeItem('nexa_session_token'); fetch('http://localhost:5000/api/v1/vault/logout', { method: 'POST' }).finally(() => { window.location.href = 'login.html'; }); };
+
+    // Attach to any exit points (demo assumes a back button or dashboard link)
+    // For this implementation, we add a floating 'Lock & Exit' button or intercept back navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'q' && e.ctrlKey) exitDashboard(); });
+
+    setInterval(fetchCryptoData, 15000);
+    setInterval(startDashboardPulse, 10000); // Polling every 10 seconds
+
+    function checkVaultSession() {
+      return window.NexaState.state.isVaultUnlocked;
+    }
+
+    function handleVaultGatekeeper(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      
+      console.log('NexaState Check:', window.NexaState.state.user);
+      
+      // If session is dead, force login
+      if (!window.NexaState.getToken()) {
+        console.warn('Session Dead: Redirecting to login...');
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      console.log('Gatekeeper: Intercepted click (Forced Re-Auth Mode)');
+      showSecurityModal();
+    }
+
+    function showSecurityModal() {
+      const overlay = document.getElementById('securityOverlay');
+      const modal = document.getElementById('securityModal');
+      
+      overlay.style.setProperty('display', 'flex', 'important');
+      overlay.style.zIndex = '10000';
+      
+      setTimeout(() => {
+        modal.classList.add('active');
+        // Auto-focus first PIN box
+        const firstPin = document.querySelector('.pin-box');
+        if (firstPin) firstPin.focus();
+      }, 10);
+    }
+
+    function handlePinInput(el, idx) {
+      if (el.value.length === 1 && idx < 5) {
+        el.nextElementSibling.focus();
+      }
+      checkPinComplete();
+    }
+
+    function handlePinBack(el, idx) {
+      if (event.key === 'Backspace' && el.value.length === 0 && idx > 0) {
+        el.previousElementSibling.focus();
+      }
+    }
+
+    function checkPinComplete() {
+      const inputs = document.querySelectorAll('.pin-box');
+      let pin = '';
+      inputs.forEach(input => pin += input.value);
+      
+      if (pin.length === 6) {
+        simulateHandshake('PIN', pin);
+      }
+    }
+
+    function closeSecurityModal() {
+      const overlay = document.getElementById('securityOverlay');
+      const modal = document.getElementById('securityModal');
+      modal.classList.remove('active');
+      setTimeout(() => overlay.style.display = 'none', 400);
+    }
+
+    async function simulateHandshake(method, value = null) {
+      const modalIcon = document.querySelector('.modal-icon i');
+      const modalTitle = document.querySelector('.modal-title');
+      const modalDesc = document.querySelector('#securityModal p');
+      
+      console.log('Gatekeeper: Verification Sent via ' + method);
+      modalTitle.innerText = `VERIFYING_${method.toUpperCase()}...`;
+      modalIcon.className = 'fas fa-spinner fa-spin';
+
+      const authValue = value || (method === 'PIN' ? '123456' : 'bio_signature_001');
+
+      try {
+        const success = await window.NexaState.unlockVault(method, authValue);
+
+        if (success) {
+          modalIcon.className = 'fas fa-check-circle';
+          modalIcon.style.color = '#00ff88';
+          modalTitle.innerText = 'ACCESS_GRANTED';
+          setTimeout(() => {
+            document.getElementById('securityOverlay').style.display = 'none';
+            navigateToWallet();
+          }, 800);
+        } else {
+          modalIcon.className = 'fas fa-times-circle';
+          modalIcon.style.color = '#ff3366';
+          modalTitle.innerText = 'ACCESS_DENIED';
+          document.querySelectorAll('.pin-box').forEach(input => input.value = '');
+          document.querySelectorAll('.pin-box')[0].focus();
+        }
+      } catch (e) {
+        modalTitle.innerText = 'SYSTEM_CONNECTION_ERROR';
+        modalTitle.style.color = '#ff3366';
+        modalDesc.innerText = 'Nexa-Core Unreachable.';
+        modalIcon.className = 'fas fa-wifi-slash';
+        modalIcon.style.color = '#ff3366';
+      }
+    }
+
+    function navigateToWallet() {
+      const overlay = document.getElementById('transitionOverlay');
+      const walletItem = document.getElementById('navWalletItem');
+      
+      // Cinematic Zoom Effect
+      walletItem.style.transform = 'scale(50)';
+      walletItem.style.opacity = '0';
+      overlay.classList.add('transition-active');
+      
+      setTimeout(() => {
+        window.location.href = 'frontend/wallet.html';
+      }, 800);
+    }
   </script>
 </body>
+
 </html>

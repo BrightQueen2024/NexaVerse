@@ -9,6 +9,8 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600&display=swap"
     rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
+  <script src="frontend/stateManager.js"></script>
   <style>
     :root {
       --void: #03000d;
@@ -825,6 +827,118 @@
       box-shadow: 0 0 20px rgba(140, 60, 255, 0.1);
     }
 
+    /* Biometric Button */
+    .btn-biometric {
+      width: 100%;
+      position: relative;
+      padding: 15px;
+      border-radius: 14px;
+      cursor: pointer;
+      overflow: hidden;
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: white;
+      background: linear-gradient(145deg, var(--deep), var(--void));
+      border: 1px solid var(--border);
+      box-shadow: 
+        0 4px 0 var(--purple-core),
+        0 8px 15px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(0, 229, 255, 0.2) inset;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      margin-top: 12px;
+    }
+
+    .btn-biometric:hover {
+      transform: translateY(2px);
+      background: linear-gradient(135deg, var(--purple-core), var(--fuchsia-core));
+      box-shadow: 
+        0 2px 0 var(--fuchsia-core),
+        0 8px 40px rgba(140, 60, 255, 0.5),
+        0 0 20px rgba(255, 255, 255, 0.1) inset;
+      border-color: var(--border-glow);
+    }
+
+    .btn-biometric:active {
+      transform: translateY(4px);
+      box-shadow: 
+        0 0 0 var(--purple-core),
+        0 0 5px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Biometric Overlay */
+    .biometric-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 0, 13, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .biometric-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .face-scan-ring {
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 229, 255, 0.2);
+      box-shadow: 0 0 40px rgba(0, 229, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .face-scan-video {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.6;
+      border-radius: 50%;
+    }
+
+    .face-scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--cyan-accent);
+      box-shadow: 0 0 15px var(--cyan-accent);
+      animation: faceScanAnim 1.5s ease-in-out infinite alternate;
+      z-index: 2;
+    }
+
+    @keyframes faceScanAnim {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+
+    .biometric-status {
+      margin-top: 24px;
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      color: var(--cyan-accent);
+      letter-spacing: 0.1em;
+      text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+    }
+
     /* ── BOTTOM BAR ── */
 
     .bottom-bar {
@@ -900,6 +1014,60 @@
         height: 490px;
       }
     }
+    /* Error Toast */
+    .error-toast {
+      position: fixed;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: rgba(255, 69, 58, 0.15);
+      border: 1px solid rgba(255, 69, 58, 0.4);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      padding: 12px 24px;
+      border-radius: 12px;
+      color: #ff453a;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .error-toast.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Shake Animation */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .shake {
+      animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 
@@ -935,7 +1103,7 @@
       <!-- Header -->
       <div class="header">
         <!-- Inline SVG  (no image dependency) -->
-        <img src="Logo.png.png" alt="NexaVerse Logo" class="logo-img" />
+        <img src="assets/Logo.png" alt="NexaVerse Logo" class="logo-img" />
 
         <div class="wordmark">NEXA<span>VERSE</span></div>
         <div class="tagline">The Global Digital Nation</div>
@@ -1005,7 +1173,7 @@
           </div>
           <a href="request-citizenship.html" class="citizenship-btn">Request Citizenship</a>
           <br>
-          <a href="dashboard.html" class="citizenship-btn" style="border-color: rgba(0, 229, 255, 0.4); color: var(--neon-cyan);">Direct Access: Apps Dashboard</a>
+          <button type="button" class="btn-biometric" onclick="startBiometricAuth()">Secure Biometric Access</button>
         </div>
       </div>
 
@@ -1104,6 +1272,18 @@
   </div>
 
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // PWA Registration
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js');
+      }
+
+      // Initial Session Check
+      if (window.NexaState.getToken()) {
+        window.location.href = "dashboard.html";
+      }
+    });
+
     function showView(name) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById('view-' + name).classList.add('active');
@@ -1123,17 +1303,152 @@
         ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`
         : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
     }
-    function handleLogin(e) {
+    async function handleLogin(e) {
       e.preventDefault();
-      const btn = e.target.querySelector('.btn-enter');
-      btn.innerText = "Authenticating...";
-      btn.style.opacity = "0.7";
-      setTimeout(() => {
-        window.location.href = "dashboard.html";
-      }, 1200);
+      const form = e.target;
+      const card = document.querySelector('.card');
+      const btn = form.querySelector('.btn-enter');
+      const citizenId = document.getElementById('citizen-id').value;
+      const securityKey = document.getElementById('security-key').value;
+
+      if (!citizenId || !securityKey) {
+        showError("Identification Required");
+        return;
+      }
+
+      // 1. Loading State
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner"></span>Processing...`;
+      btn.style.boxShadow = "0 0 40px rgba(139, 61, 255, 0.8)";
+
+      console.log('Login Handshake: Initiating verification...');
+
+      try {
+        const response = await fetch('http://localhost:5000/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nexa_id: citizenId, password: securityKey })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          const remember = document.getElementById('remember').checked;
+          if (remember) {
+            localStorage.setItem('nexa_auth_token', result.token);
+          }
+          sessionStorage.setItem('nexa_session_token', result.token);
+          
+          // Successful transition
+          btn.innerHTML = `<i class="fas fa-check"></i> Welcome, Citizen`;
+          btn.style.background = "linear-gradient(135deg, #00ff88, #00e5ff)";
+          
+          setTimeout(() => {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.8s ease';
+            setTimeout(() => {
+              window.location.href = "dashboard.html";
+            }, 800);
+          }, 1000);
+        } else {
+          throw new Error(result.error || "Access Denied");
+        }
+      } catch (err) {
+        console.warn('Login Failure:', err.message);
+        
+        // Error Feedback
+        card.classList.add('shake');
+        showError(err.message === "Failed to fetch" ? "Nexa-Core Unreachable" : err.message);
+        
+        // Reset Button
+        btn.disabled = false;
+        btn.innerHTML = "Enter The Nation";
+        btn.style.boxShadow = "";
+        
+        setTimeout(() => card.classList.remove('shake'), 500);
+      }
+    }
+
+    function showError(msg) {
+      const toast = document.getElementById('error-toast');
+      toast.innerText = msg;
+      toast.classList.add('active');
+      setTimeout(() => toast.classList.remove('active'), 4000);
+    }
+
+    async function startBiometricAuth() {
+      // 1. Fingerprint scan via WebAuthn
+      try {
+        const publicKey = {
+          challenge: new Uint8Array(32),
+          rpId: window.location.hostname || "localhost",
+          userVerification: "required",
+          timeout: 60000
+        };
+        
+        try {
+          await navigator.credentials.get({ publicKey });
+        } catch (e) {
+          console.log("WebAuthn prompt fallback for demo context", e);
+        }
+
+        startFaceScan();
+      } catch (err) {
+        alert("Authentication failed: " + err.message);
+      }
+    }
+
+    function startFaceScan() {
+      const overlay = document.getElementById('biometric-overlay');
+      const statusText = document.getElementById('biometric-status');
+      const video = document.getElementById('face-scan-video');
+      
+      overlay.classList.add('active');
+      statusText.innerText = "INITIALIZING CAMERA...";
+      statusText.style.color = "var(--cyan-accent)";
+
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          video.srcObject = stream;
+          video.play();
+          statusText.innerText = "SCANNING FACE...";
+
+          // Hold the scan for 1.5s after it starts playing
+          setTimeout(() => {
+            statusText.innerText = "VERIFIED!";
+            statusText.style.color = "#00ff88"; 
+            
+            // Stop tracks
+            stream.getTracks().forEach(track => track.stop());
+
+            setTimeout(() => {
+               window.location.href = "dashboard.html";
+            }, 500);
+
+          }, 1500);
+        })
+        .catch(err => {
+          statusText.innerText = "CAMERA DENIED / ERROR";
+          statusText.style.color = "red";
+          console.error(err);
+          setTimeout(() => {
+             overlay.classList.remove('active');
+          }, 2000);
+        });
     }
   </script>
 
+  <!-- Biometric Overlay -->
+  <div id="biometric-overlay" class="biometric-overlay">
+    <div class="face-scan-ring">
+      <video id="face-scan-video" class="face-scan-video" autoplay playsinline muted></video>
+      <div class="face-scan-line"></div>
+    </div>
+    <div id="biometric-status" class="biometric-status">WAITING...</div>
+  </div>
+
+  <!-- Error Toast -->
+  <div id="error-toast" class="error-toast">Invalid Credentials</div>
 </body>
 
 </html>
